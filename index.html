@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#100b10">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="You're invited to Navid's 18th! Sunday, November 29, 2026, 6–8 PM at Amato Pizza in San Jose.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="NAVID XVIII — You're Invited">
+  <meta property="og:description" content="Nov 29 · 6–8 PM · Amato Pizza, San Jose. Are you coming? 😏">
+  <meta property="og:image" content="assets/navid-portrait.jpg">
+  <title>Navid's 18th — The Invitation</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Sans:wght@400;500;600;700;800&family=Permanent+Marker&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <main class="invite" id="top">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Navid's 18th, back to top">N<span>✳</span>18</a>
+      <span class="topbar-center"><span class="pulse-dot"></span> OFFICIAL INVITATION <span class="bar">/</span> NOV 29, 2026</span>
+      <div class="topbar-actions">
+        <button class="music-control" id="music-button" type="button" aria-label="Play background music" aria-pressed="false" title="Play or pause the party music">
+          <span class="music-icon" aria-hidden="true">♫</span><span id="music-status">PLAY</span>
+        </button>
+        <button class="share-control" id="share-button" type="button" aria-label="Share this invitation">SHARE <span aria-hidden="true">↗</span></button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <section class="headline" aria-labelledby="headline-title">
+        <p class="eyebrow"><span class="red-cross">✳</span> YOU'RE INVITED TO THE MAIN EVENT</p>
+        <h1 id="headline-title" class="main-title">
+          <span class="name">NAVID<span class="apostrophe">'S</span></span>
+          <span class="number-line"><span class="big-number">18</span><sup>TH</sup><span class="marker-title">birthday <em>party!</em></span></span>
+        </h1>
+        <p class="headline-tail">ONE NIGHT ONLY <span>✦</span> SAN JOSE, CALIFORNIA</p>
+      </section>
+
+      <section class="photo-stage" aria-label="Four cinematic photographs of Navid">
+        <div class="photo-glow" aria-hidden="true"></div>
+        <span class="ghost-number" aria-hidden="true">XVIII</span>
+        <figure class="photo shot-one"><img src="assets/navid-portrait.webp" alt="Navid wearing a dark graphic hoodie" width="850" height="1001" fetchpriority="high"></figure>
+        <figure class="photo shot-two"><img src="assets/navid-cap.webp" alt="Navid wearing a white and navy cap" width="650" height="1002"></figure>
+        <figure class="photo shot-three"><img src="assets/navid-night-1.webp" alt="Navid in a cinematic dark photograph" width="960" height="601"></figure>
+        <figure class="photo shot-four"><img src="assets/navid-night-2.webp" alt="Navid in another dramatic portrait" width="960" height="742"></figure>
+        <svg class="crown" viewBox="0 0 108 80" aria-hidden="true"><path d="M10 22 29 43 54 11 79 43 99 22 90 65H18L10 22Z"/><path d="M20 72h68"/><circle cx="10" cy="20" r="4"/><circle cx="54" cy="9" r="4"/><circle cx="99" cy="20" r="4"/></svg>
+        <div class="sticker"><small>EST.</small><strong>2008</strong><small>LEVEL 18</small></div>
+        <span class="scribble-star" aria-hidden="true">✳</span>
+        <span class="stage-label">THE BIRTHDAY BOY <span>↗</span></span>
+      </section>
+
+      <section class="event" aria-label="Birthday party time and address">
+        <div class="event-heading"><span>THE PARTY PLAN</span><span id="countdown" aria-live="off">✳ NOV 29</span></div>
+        <div class="event-grid">
+          <div class="event-time"><span class="event-mini">WHEN</span><div><strong>SUN, NOV 29</strong><small>6:00 – 8:00 PM · PST</small></div></div>
+          <div class="event-place"><span class="event-mini">WHERE</span><div><strong>AMATO PIZZA</strong><small>6081 Meridian Ave, Ste 60<br>San Jose, CA 95120</small></div></div>
+        </div>
+        <div class="event-links">
+          <a href="https://www.google.com/maps/search/?api=1&amp;query=6081%20Meridian%20Ave%20Ste%2060%2C%20San%20Jose%2C%20CA%2095120" target="_blank" rel="noopener noreferrer">GET DIRECTIONS <span aria-hidden="true">↗</span></a>
+          <button id="calendar-button" type="button">ADD TO CALENDAR <span aria-hidden="true">+</span></button>
+        </div>
+      </section>
+
+      <section class="rsvp" aria-labelledby="rsvp-title">
+        <div class="rsvp-text"><span class="rsvp-marker">✳ RSVP / NO EXCUSES</span><h2 id="rsvp-title">YOU COMING? <span>😏</span></h2><p id="rsvp-subtitle">Good luck trying to say no.</p></div>
+        <div class="rsvp-interaction">
+          <div class="rsvp-buttons" id="rsvp-buttons">
+            <button class="yes-button" id="yes-button" type="button">YES, I'M IN! <span aria-hidden="true">✳</span></button>
+            <button class="no-button" id="no-button" type="button">NO, THANKS 😐</button>
+          </div>
+          <p id="rsvp-message" class="rsvp-message" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+    </div>
+
+    <footer class="footer"><span>NAVID / XVIII / 2026</span><span>18 YEARS IN THE MAKING. ONE UNFORGETTABLE NIGHT.</span><span>SEE YOU THERE ✳</span></footer>
+  </main>
+  <audio id="background-music" src="assets/gorg-2.mp3" preload="auto" autoplay loop playsinline></audio>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
