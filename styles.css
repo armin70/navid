@@ -86,13 +86,15 @@ button:disabled{cursor:default;}
 .rsvp-text p{font:500 10px/1.4 var(--body);color:#b6abb0;margin:2px 0 0;text-align:left;}
 .rsvp-interaction{min-width:0;}
 .rsvp-buttons{height:73px;width:100%;position:relative;overflow:visible;isolation:isolate;}
+.escape-layer{position:fixed;inset:0;z-index:80;pointer-events:none;}
+.escape-layer .no-button{pointer-events:auto;}
 .yes-button,.no-button{position:absolute;min-height:44px;padding:8px 14px;border-radius:2px;white-space:nowrap;font:800 12px/1.3 var(--body);transition:background .2s,box-shadow .2s,transform .18s,left .18s,top .18s;}
 .yes-button{left:0;top:13px;width:50%;background:var(--red);border:1px solid var(--red);color:white;box-shadow:0 8px 22px #f0354330;z-index:1;}
 .yes-button:hover{background:#ff4855;box-shadow:0 10px 25px #f0354355;}
 .yes-button span{margin-left:6px;}
 .no-button{left:60%;top:13px;width:40%;background:#21171d;border:1px solid #eee3df70;color:var(--cream);z-index:2;touch-action:manipulation;}
 .no-button.is-teasing{border-color:#ff8790;}
-.no-button.is-escaping{position:fixed;width:136px;max-width:calc(100vw - 24px);z-index:45;box-shadow:0 14px 35px #000b,0 0 0 3px #f0354340;transform:rotate(-7deg);transition:left .18s ease-out,top .18s ease-out,transform .18s ease-out;}
+.no-button.is-escaping{position:fixed;width:136px;max-width:calc(100vw - 24px);z-index:1;box-shadow:0 14px 35px #000b,0 0 0 3px #f0354340;transform:rotate(-7deg);transition:left .18s ease-out,top .18s ease-out,transform .18s ease-out;}
 .rsvp-message{font:700 11px/1.45 var(--body);color:#ffe4b7;min-height:19px;margin:-5px 0 0;text-align:center;}
 .rsvp.is-accepted .yes-button{background:#268862;border-color:#36bf88;box-shadow:0 0 27px #30d49135;}
 .rsvp.is-accepted .no-button{display:none;}
@@ -100,8 +102,22 @@ button:disabled{cursor:default;}
 .rsvp.is-final .no-button{background:#4b1928;color:#ffc6cc;border-color:var(--red);}
 .footer{height:34px;border-top:1px solid var(--line);flex:none;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;color:#978b90;font-size:9px;letter-spacing:.12em;font-weight:800;white-space:nowrap;}
 .footer span:last-child{color:var(--red);}
-.toast{position:fixed;bottom:25px;left:50%;transform:translate(-50%,120px);opacity:0;transition:transform .24s,opacity .24s;background:var(--red);color:#fff;padding:12px 18px;font-size:12px;font-weight:800;z-index:60;pointer-events:none;white-space:nowrap;box-shadow:0 20px 35px #0007;}
+.toast{position:fixed;bottom:25px;left:50%;transform:translate(-50%,120px);opacity:0;transition:transform .24s,opacity .24s;background:var(--red);color:#fff;padding:12px 18px;font-size:12px;font-weight:800;z-index:60;pointer-events:none;white-space:normal;text-align:center;max-width:calc(100vw - 30px);box-shadow:0 20px 35px #0007;}
 .toast.is-visible{transform:translate(-50%,0);opacity:1;}
+/* On mobile, audible autoplay needs a real user gesture. The entry overlay
+   makes that first tap intentional without adding a scrolled section. */
+.sound-gate[hidden]{display:none!important;}
+.sound-gate{position:fixed;inset:0;z-index:100;display:grid;place-items:center;overflow:auto;background:rgba(8,6,12,.83);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);padding:20px;}
+.sound-gate-card{width:min(100%,390px);padding:28px 21px 24px;border:1px solid #ff6b8170;box-shadow:0 0 0 5px #e9364713,0 25px 85px #000b;background:linear-gradient(155deg,#2b141e,#130e14 72%);display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;}
+.sound-gate-kicker{font:800 10px/1.2 var(--body);letter-spacing:.23em;color:#e9bcc2;}
+.sound-gate-note{color:var(--red);font-size:65px;line-height:1;filter:drop-shadow(0 0 15px #f0354380);}
+.sound-gate-card h2{font:900 clamp(33px,9vw,48px)/.95 var(--display);margin:0;}
+.sound-gate-card p{font:700 11px/1.5 var(--body);letter-spacing:.12em;color:#b9a6ae;margin:0 0 10px;}
+.sound-gate-enter{width:100%;min-height:54px;background:var(--red);border:1px solid var(--red);color:#fff;font:900 14px/1 var(--body);letter-spacing:.06em;}
+.sound-gate-enter span{font-size:22px;vertical-align:-2px;margin-left:12px;}
+.sound-gate-silent{border:0;background:transparent;color:#b7abb0;padding:8px;font:800 10px var(--body);letter-spacing:.13em;}
+.sound-gate-enter:hover{background:#ff4656;}
+body.sound-gate-open{overflow:hidden;}
 @keyframes musicBeat{50%{transform:translateY(-2px) scale(1.14);}}
 @keyframes pulse{50%{box-shadow:0 0 24px 6px #f33742b0;}}
 @keyframes floatOne{50%{transform:rotate(2deg) translateY(-7px);}}

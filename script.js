@@ -2,13 +2,17 @@
 (() => {
   'use strict';
 
-  // Best-effort autoplay with sound. Most mobile browsers permit audible
-  // playback only after a user gesture; the first tap anywhere unlocks it.
+  // Audible autoplay is restricted on most mobile browsers. Try immediately,
+  // then offer a clear one-tap entrance that starts the looping music.
   const music = document.getElementById('background-music');
+  music.volume = 0.25;
   const musicButton = document.getElementById('music-button');
   const musicStatus = document.getElementById('music-status');
+  const soundGate = document.getElementById('sound-gate');
+  const enterWithSound = document.getElementById('enter-with-sound');
+  const enterWithoutSound = document.getElementById('enter-without-sound');
   let manuallyPaused = false;
-  let playRequestPending = false;
+  let gateDismissed = false;
 
   function refreshMusicButton() {
     const playing = !music.paused && !music.ended;
@@ -18,46 +22,64 @@
     musicStatus.textContent = playing ? 'ON' : manuallyPaused ? 'OFF' : 'PLAY';
   }
 
-  function removeUnlockListeners() {
-    document.removeEventListener('pointerdown', unlockAudio, true);
-    document.removeEventListener('touchstart', unlockAudio, true);
-    document.removeEventListener('keydown', unlockAudio, true);
+  function hideSoundGate() {
+    gateDismissed = true;
+    soundGate.hidden = true;
+    document.body.classList.remove('sound-gate-open');
+  }
+
+  function showSoundGate() {
+    if (gateDismissed || manuallyPaused || !music.paused || !window.matchMedia('(pointer: coarse)').matches) return;
+    soundGate.hidden = false;
+    document.body.classList.add('sound-gate-open');
   }
 
   function tryPlayMusic() {
-    if (manuallyPaused || playRequestPending || !music.paused) return;
-    playRequestPending = true;
-    // IMPORTANT: play() is called synchronously within the gesture handler
-    // before awaiting its promise, which is required for mobile autoplay.
-    const attempt = music.play();
-    if (attempt && typeof attempt.then === 'function') {
-      attempt.then(() => {
-        removeUnlockListeners();
+    if (manuallyPaused || !music.paused) return;
+    // play() MUST be invoked synchronously during a real click/touch for iOS.
+    // Do not block a user's gesture while the initial autoplay promise is pending.
+    let request;
+    try {
+      request = music.play();
+    } catch (_) {
+      showSoundGate();
+      refreshMusicButton();
+      return;
+    }
+    if (request && typeof request.then === 'function') {
+      request.then(() => {
+        hideSoundGate();
         refreshMusicButton();
       }).catch(() => {
-        // Autoplay was blocked. The music button remains available, and
-        // another interaction can unlock playback.
+        // Silent autoplay is possible, but audible autoplay cannot be forced.
+        showSoundGate();
         refreshMusicButton();
-      }).finally(() => { playRequestPending = false; });
+      });
     } else {
-      playRequestPending = false;
+      if (!music.paused) hideSoundGate();
       refreshMusicButton();
     }
   }
 
-  function unlockAudio(event) {
-    // Clicking the explicit music toggle must not first trigger automatic
-    // play, otherwise the click would immediately pause it again.
-    if (event.target instanceof Element && event.target.closest('#music-button')) return;
-    if (!manuallyPaused) tryPlayMusic();
-  }
-
   music.addEventListener('playing', () => {
-    removeUnlockListeners();
+    hideSoundGate();
     refreshMusicButton();
   });
   music.addEventListener('pause', refreshMusicButton);
   music.addEventListener('ended', refreshMusicButton);
+
+  enterWithSound.addEventListener('click', () => {
+    manuallyPaused = false;
+    hideSoundGate();
+    tryPlayMusic();
+  });
+  enterWithoutSound.addEventListener('click', () => {
+    manuallyPaused = true;
+    music.pause();
+    hideSoundGate();
+    refreshMusicButton();
+  });
+
   musicButton.addEventListener('click', () => {
     if (!music.paused) {
       manuallyPaused = true;
@@ -69,10 +91,15 @@
     refreshMusicButton();
   });
 
-  // Touch/pointer/keyboard support; listeners are removed after playback starts.
-  document.addEventListener('pointerdown', unlockAudio, {capture:true, passive:true});
-  document.addEventListener('touchstart', unlockAudio, {capture:true, passive:true});
-  document.addEventListener('keydown', unlockAudio, true);
+  // Desktop fallback: any normal interaction can start playback when allowed.
+  // Mobile visitors see the explicit "ENTER WITH SOUND" control if blocked.
+  document.addEventListener('click', (event) => {
+    if (manuallyPaused || !music.paused || !soundGate.hidden) return;
+    if (event.target.closest('#music-button, #enter-with-sound, #enter-without-sound')) return;
+    tryPlayMusic();
+  }, true);
+
+  music.loop = true;
   refreshMusicButton();
   tryPlayMusic();
 
@@ -139,76 +166,122 @@
 
   const rsvp = document.querySelector('.rsvp');
   const playground = document.getElementById('rsvp-buttons');
+  const escapeLayer = document.getElementById('escape-layer');
   const yes = document.getElementById('yes-button');
   const no = document.getElementById('no-button');
   const message = document.getElementById('rsvp-message');
   const subtitle = document.getElementById('rsvp-subtitle');
   const NO_LIMIT = 4;
   let noAttempts = 0;
-  let lastDodge = 0;
+  let lastDodge = -Infinity;
   let finished = false;
   let lastTouchAt = -Infinity;
+
+  function returnNoToRow() {
+    // Reparent back after escaping. This also restores the original mobile layout.
+    no.style.transition = 'none';
+    no.classList.remove('is-escaping', 'is-teasing');
+    no.style.left = '';
+    no.style.top = '';
+    playground.appendChild(no);
+    void no.offsetWidth;
+    requestAnimationFrame(() => { no.style.transition = ''; });
+  }
 
   function dodgeNo() {
     if (finished) return;
     const now = performance.now();
-    if (now - lastDodge < 180) return;
+    if (now - lastDodge < 180) return; // ignore duplicate touch/pointer events
     lastDodge = now;
-    noAttempts += 1;
+    noAttempts++;
 
     if (noAttempts >= NO_LIMIT) {
       finished = true;
       rsvp.classList.add('is-final');
       message.textContent = "NOPE! 😂 You're coming. No excuses!";
       no.textContent = 'GOTCHA! 😈';
-      // Snap back to the RSVP row without interpolating from its previous fixed coordinates.
-      no.style.transition = 'none';
-      no.classList.remove('is-escaping', 'is-teasing');
-      no.style.left = '';
-      no.style.top = '';
-      void no.offsetWidth;
-      requestAnimationFrame(() => { no.style.transition = ''; });
+      returnNoToRow();
+      showToast("NOPE! 😂 YOU CAN'T NOT COME!");
       return;
     }
 
-    // A real runaway button: it jumps around the visible screen, never offscreen.
-    // Works on mobile touch and desktop mouse without causing extra page scrolling.
+    // Move to a top-level overlay: the old button was trapped behind the photo
+    // and event panels after its first escape due to CSS stacking contexts.
+    if (no.parentElement !== escapeLayer) {
+      const rect = no.getBoundingClientRect();
+      escapeLayer.appendChild(no);
+      no.classList.add('is-escaping');
+      no.style.left = `${rect.left}px`;
+      no.style.top = `${rect.top}px`;
+      void no.offsetWidth;
+    }
+    no.classList.add('is-escaping', 'is-teasing');
+
+    // Positions are chosen inside the visual viewport, including short phones.
+    const visual = window.visualViewport;
+    const width = visual ? visual.width : window.innerWidth;
+    const height = visual ? visual.height : window.innerHeight;
+    const offsetX = visual ? visual.offsetLeft : 0;
+    const offsetY = visual ? visual.offsetTop : 0;
+    const margin = 14;
+    const buttonWidth = no.offsetWidth;
+    const buttonHeight = no.offsetHeight;
     const spots = [
-      {x: .66, y: .23}, // near the photos
-      {x: .07, y: .53}, // opposite side of the screen
-      {x: .58, y: .72}  // one last escape
+      { x: 0.75, y: 0.29 },
+      { x: 0.09, y: 0.53 },
+      { x: 0.61, y: 0.75 }
     ];
     const spot = spots[(noAttempts - 1) % spots.length];
-    no.classList.add('is-escaping', 'is-teasing');
-    const margin = 12;
-    const maxLeft = Math.max(margin, innerWidth - no.offsetWidth - margin);
-    const maxTop = Math.max(margin, innerHeight - no.offsetHeight - margin);
-    no.style.left = `${Math.min(maxLeft, Math.max(margin, innerWidth * spot.x))}px`;
-    no.style.top = `${Math.min(maxTop, Math.max(margin, innerHeight * spot.y))}px`;
-    const teasing = [
+    const maxX = Math.max(margin, width - buttonWidth - margin);
+    const maxY = Math.max(60, height - buttonHeight - margin);
+    const x = offsetX + Math.min(maxX, Math.max(margin, width * spot.x));
+    const y = offsetY + Math.min(maxY, Math.max(60, height * spot.y));
+    // One animation frame keeps a readable darting motion without scroll jumps.
+    requestAnimationFrame(() => {
+      no.style.left = `${x}px`;
+      no.style.top = `${y}px`;
+    });
+    message.textContent = [
       'Nice try! 😏',
       'Still trying to say no? 😂',
       'The YES button is right there! 😎'
-    ];
-    message.textContent = teasing[noAttempts - 1];
+    ][noAttempts - 1];
   }
 
-  // Mouse/trackpad: dodge when approached; touch: dodge on finger-down.
-  no.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse' || e.pointerType === 'pen') dodgeNo(); });
-  no.addEventListener('pointerdown', e => {
-    if (e.pointerType === 'touch' && !finished) { lastTouchAt = performance.now(); e.preventDefault(); dodgeNo(); }
+  no.addEventListener('pointerenter', (event) => {
+    if ((event.pointerType === 'mouse' || event.pointerType === 'pen') && !finished) dodgeNo();
   });
-  no.addEventListener('click', e => {
-    if (performance.now() - lastTouchAt < 450) { e.preventDefault(); return; }
+  no.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'touch' && !finished) {
+      lastTouchAt = performance.now();
+      event.preventDefault();
+      dodgeNo();
+    }
+  });
+  // Compatibility for iOS Safari versions with different pointer handling.
+  no.addEventListener('touchstart', (event) => {
+    if (!finished) {
+      lastTouchAt = performance.now();
+      event.preventDefault();
+      dodgeNo();
+    }
+  }, {passive: false});
+  no.addEventListener('click', (event) => {
+    if (performance.now() - lastTouchAt < 650) {
+      event.preventDefault();
+      return;
+    }
     if (finished) {
       message.textContent = 'Appeal denied! 😂 See you there! 🎉';
     } else {
-      e.preventDefault(); dodgeNo(); // keyboard and fallback click
+      event.preventDefault();
+      dodgeNo();
     }
   });
 
   yes.addEventListener('click', () => {
     finished = true;
+    if (no.parentElement === escapeLayer) returnNoToRow();
     rsvp.classList.add('is-accepted');
     rsvp.classList.remove('is-final');
     yes.innerHTML = "YOU'RE IN! 🎉 WELCOME!";

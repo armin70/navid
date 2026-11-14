@@ -6,12 +6,14 @@ A compact, mobile-first birthday invitation made with plain **HTML, CSS and Java
 - Black-and-red visual style, neon crown, and four photos of Navid
 - Minimal scrolling on phones; party information and RSVP stay close together
 - Fun RSVP: tap **YES** for a welcome message; the **NO** button runs away from taps or the mouse, then displays a playful message after four attempts
-- Autoplaying, looping background music (`assets/gorg-2.mp3`) with a compact PLAY / ON / OFF toggle
+- Looping background music (`assets/gorg-2.mp3`), immediate autoplay attempt, and a one-tap sound entrance when mobile autoplay is blocked
 - Countdown, directions to the venue, add-to-calendar button and sharing
 - Responsive layouts, accessibility-friendly reduced-motion styling
 - No framework, no backend, ready for **GitHub Pages**
 
-**Audio autoplay note:** The site attempts to play the song immediately and loops it continuously. Chrome, Safari, and mobile browsers may block audible autoplay until the visitor interacts with the page. In that case, the **first touch/click/key press** attempts to start the music, and the **♫ PLAY** button always offers a direct way to play or pause. Browser policies cannot be bypassed with HTML/JavaScript.
+**Audio on mobile:** iOS Safari, Chrome, and most mobile browsers will block autoplay **with sound** until a person interacts with the page. The site still attempts autoplay immediately. If blocked on a touch device, a full-screen English entrance appears: **ENTER WITH MUSIC**. That single tap begins the repeating MP3; **CONTINUE WITHOUT MUSIC** lets visitors skip it. The ♫ button can pause/restart it later. There is no reliable way to force audible autoplay before a tap in all mobile browsers.
+
+**RSVP fixes:** On touchscreens, the NO button now escapes into a top-level overlay so it remains visible and tappable after every jump (rather than hiding behind the photos). The fourth NO attempt displays a playful message. Touch, pointer, mouse and click inputs are supported.
 
 **Music rights:** Before publishing a public site that contains this recording, make sure you have permission to distribute and use the song.
 

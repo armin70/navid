@@ -15,8 +15,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Sans:wght@400;500;600;700;800&family=Permanent+Marker&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <script src="script.js" defer></script>
+  <link rel="stylesheet" href="styles.css?v=2">
+  <script src="script.js?v=2" defer></script>
 </head>
 <body>
   <div class="grain" aria-hidden="true"></div>
@@ -81,6 +81,17 @@
 
     <footer class="footer"><span>NAVID / XVIII / 2026</span><span>18 YEARS IN THE MAKING. ONE UNFORGETTABLE NIGHT.</span><span>SEE YOU THERE ✳</span></footer>
   </main>
+  <div id="escape-layer" class="escape-layer" aria-live="off"></div>
+  <div id="sound-gate" class="sound-gate" hidden>
+    <div class="sound-gate-card" role="dialog" aria-modal="true" aria-labelledby="sound-gate-title">
+      <span class="sound-gate-kicker">NAVID / XVIII / 2026</span>
+      <span class="sound-gate-note" aria-hidden="true">♫</span>
+      <h2 id="sound-gate-title">LET'S MAKE SOME NOISE.</h2>
+      <p>OPEN THE INVITE WITH THE SOUND ON.</p>
+      <button type="button" id="enter-with-sound" class="sound-gate-enter">ENTER WITH MUSIC <span aria-hidden="true">↗</span></button>
+      <button type="button" id="enter-without-sound" class="sound-gate-silent">CONTINUE WITHOUT MUSIC</button>
+    </div>
+  </div>
   <audio id="background-music" src="assets/gorg-2.mp3" preload="auto" autoplay loop playsinline></audio>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
